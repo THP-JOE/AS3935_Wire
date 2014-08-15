@@ -1,5 +1,5 @@
 /*
-  AS3935.cpp - AS3935 Franklin Lightning Sensor™ IC by AMS library demo code
+  AS3935_Wire.cpp - AS3935 Franklin Lightning Sensor™ IC by AMS library demo code
   Copyright (c) 2012 Raivis Rengelis (raivis [at] rrkb.lv). All rights reserved.
   Modified in 2014 to use standard Wire library by Edward Gutting (gutting [at] gmail.com).
 
