@@ -1,5 +1,5 @@
 /*
-  AS3935_Wire.cpp - AS3935 Franklin Lightning Sensor™ IC by AMS library demo code
+  AS3935.cpp - AS3935 Franklin Lightning Sensor™ IC by AMS library demo code
   Copyright (c) 2012 Raivis Rengelis (raivis [at] rrkb.lv). All rights reserved.
   Modified in 2014 to use standard Wire library by Edward Gutting (gutting [at] gmail.com).
 
@@ -42,24 +42,23 @@ uint8_t AS3935::_ffsz(uint8_t mask)
 
 void AS3935::registerWrite(uint8_t reg, uint8_t mask, uint8_t data)
 {
-  Serial.print("regW ");
-  Serial.print(reg,HEX);
-  Serial.print(" ");
-  Serial.print(mask,HEX);
-  Serial.print(" ");
-  Serial.print(data,HEX);
-  Serial.print(" read ");
-  int addr = _ADDR;
-    //read 1 uint8_t
+	Serial.print("regW ");
+	Serial.print(reg,HEX);
+  	Serial.print(" ");
+  	Serial.print(mask,HEX);
+  	Serial.print(" ");
+  	Serial.print(data,HEX);
+  	Serial.print(" read ");
+  	int addr = _ADDR;
+
     Wire.beginTransmission(_ADDR);
 	Wire.write(reg);
 	Wire.endTransmission(false);
+	//read 1 uint8_t
 	Wire.requestFrom(addr, 1);
+	//put it to regval
    	uint8_t regval = Wire.read();
 
-    // I2c.read((uint8_t)_ADDR, (uint8_t)reg, (uint8_t)0x01);
-    //put it to regval
-	// uint8_t regval = I2c.receive();
   	Serial.print(regval,HEX);
     //do masking
 	regval &= ~(mask);
@@ -71,13 +70,10 @@ void AS3935::registerWrite(uint8_t reg, uint8_t mask, uint8_t data)
     Serial.print(regval,HEX);
     Serial.print(" err ");
     //write the register back
-    
     Wire.beginTransmission(_ADDR);	
    	Wire.write(reg);
    	Wire.write(regval);
-  	Wire.endTransmission(false);
-    
-    Serial.println(0,HEX);    
+  	Serial.println(Wire.endTransmission(false),HEX);    
 }
 
 uint8_t AS3935::registerRead(uint8_t reg, uint8_t mask)
@@ -86,31 +82,25 @@ uint8_t AS3935::registerRead(uint8_t reg, uint8_t mask)
 	Wire.beginTransmission(_ADDR);
    	Wire.write(reg);
 	Wire.endTransmission(false);
-	Wire.requestFrom(addr, 1);
 	//read 1 uint8_t
-    //I2c.read((uint8_t)_ADDR, (uint8_t)reg, (uint8_t)0x01);
+	Wire.requestFrom(addr, 1);
     //put it to regval
    	uint8_t regval = Wire.read();
     //mask
 	regval = regval & mask;
 	if (mask)
 		regval >>= (_ffsz(mask)-1);
-		
-	
 	return regval;
 }
 
 void AS3935::reset()
 {
     //write to 0x3c, value 0x96
-    // unint8_t reg = 0x3c;
-    // unint8_t value = 0x96;
 	Wire.beginTransmission(_ADDR);	
    	Wire.write(0x3c);
    	Wire.write(0x96);
   	Wire.endTransmission(false);
     
-	// I2c.write((uint8_t)_ADDR, (uint8_t)0x3c, (uint8_t)0x96);
 	delay(2);
 }
 
@@ -160,18 +150,16 @@ bool AS3935::calibrate()
 	delay(2);
 	registerWrite(AS3935_DISP_LCO,0);
 	// and now do RCO calibration
-	// unint8_t reg = 0x3D;
-    // unint8_t value = 0x96;
 	Wire.beginTransmission(_ADDR);	
    	Wire.write(0x3D);
    	Wire.write(0x96);
  	Wire.endTransmission(false);
 	
-    // I2c.write((uint8_t)_ADDR, (uint8_t)0x3D, (uint8_t)0x96);
 	delay(3);
 	// if error is over 109, we are outside allowed tuning range of +/-3.5%
     Serial.print("Difference ");
     Serial.println(bestdiff);
+    Serial.print("Best Tune: ");
     Serial.println(bestTune);
 	return bestdiff > 109?false:true;
 }	
@@ -184,18 +172,10 @@ void AS3935::powerDown()
 void AS3935::powerUp()
 {
 	registerWrite(AS3935_PWD,0);
-	
-	// unint8_t reg = 0x3D;
-    // unint8_t value = 0x96;
 	Wire.beginTransmission(_ADDR);	
-
    	Wire.write(0x3D);
    	Wire.write(0x96);
-
   	Wire.endTransmission(false);
-	
-	
-    // I2c.write((uint8_t)_ADDR, (uint8_t)0x3D, (uint8_t)0x96);
 	delay(3);
 }
 
